@@ -1,10 +1,19 @@
 import mysql.connector
 
 
-def save_scores_to_mysql(pagerank_scores, tfidf_scores):
-    conn = mysql.connector.connect(
-        user='', password='', host='localhost', database=''
+def create_connection():
+    """Create and return MySQL connection"""
+    return mysql.connector.connect(
+        user='your_username', 
+        password='your_password', 
+        host='localhost', 
+        database='your_database'
     )
+
+
+def save_scores_to_mysql(pagerank_scores, tfidf_scores):
+    """Save PageRank and TF-IDF scores to MySQL database"""
+    conn = create_connection()
     cursor = conn.cursor()
 
     # Pastikan tabel sudah dibuat:
