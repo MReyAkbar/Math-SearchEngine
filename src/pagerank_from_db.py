@@ -1,41 +1,69 @@
-import mysql.connector
 from pagerank import pagerank
+from database import create_connection, fetch_links_for_pagerank, save_pagerank_to_db
+from mysql.connector import Error
 
-def connect_to_mysql():
-    return mysql.connector.connect(
-        host='localhost', user='root', password='yourpassword', database='yourdatabase'
-    )
 
-def fetch_links(conn):
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, url FROM pages")
-    id_url_map = {url: idx for idx, url in cursor.fetchall()}
+def update_pagerank_in_pages_table(pagerank_scores, url_to_id):
+    """Update PageRank scores directly in the pages table"""
+    conn = create_connection()
+    if not conn:
+        return False
+    
+    try:
+        cursor = conn.cursor()
+        id_to_url = {v: k for k, v in url_to_id.items()}
+        
+        for page_id, score in pagerank_scores.items():
+            if page_id in id_to_url:
+                url = id_to_url[page_id]
+                cursor.execute("UPDATE pages SET pagerank = %s WHERE url = %s", (float(score), url))
+        
+        conn.commit()
+        print("PageRank scores updated in pages table")
+        return True
+        
+    except Error as e:
+        print(f"Error updating PageRank in pages table: {e}")
+        return False
+    finally:
+        cursor.close()
+        conn.close()
 
-    n = len(id_url_map)
-    adj_matrix = [[0] * n for _ in range(n)]
 
-    cursor.execute("SELECT from_url, to_url FROM links")
-    for from_url, to_url in cursor.fetchall():
-        if from_url in id_url_map and to_url in id_url_map:
-            i = id_url_map[from_url]
-            j = id_url_map[to_url]
-            adj_matrix[i][j] = 1
+def main():
+    """Main function to calculate and save PageRank from database"""
+    print("Fetching links from database...")
+    adj_matrix, url_to_id = fetch_links_for_pagerank()
+    
+    if adj_matrix is None or url_to_id is None:
+        print("Failed to fetch links from database")
+        return
+    
+    print(f"Processing {len(url_to_id)} pages...")
+    
+    # Calculate PageRank
+    ranks = pagerank(adj_matrix)
+    
+    # Convert to dictionary format
+    pagerank_scores = {i: float(rank) for i, rank in enumerate(ranks)}
+    
+    # Save PageRank scores
+    if save_pagerank_to_db(pagerank_scores):
+        print("PageRank scores saved to pagerank_scores table")
+    
+    # Also update the main pages table
+    if update_pagerank_in_pages_table(pagerank_scores, url_to_id):
+        print("PageRank scores updated in pages table")
+    
+    # Print results
+    print("\nTop 5 PageRank Scores:")
+    id_to_url = {v: k for k, v in url_to_id.items()}
+    sorted_scores = sorted(pagerank_scores.items(), key=lambda x: x[1], reverse=True)[:5]
+    
+    for page_id, score in sorted_scores:
+        url = id_to_url.get(page_id, f"Page {page_id}")
+        print(f"{score:.4f}: {url}")
 
-    cursor.close()
-    return adj_matrix, id_url_map
-
-def update_pagerank_scores(conn, ranks, id_url_map):
-    cursor = conn.cursor()
-    url_id_map = {v: k for k, v in id_url_map.items()}
-    for i, score in enumerate(ranks):
-        url = url_id_map[i]
-        cursor.execute("UPDATE pages SET pagerank = %s WHERE url = %s", (float(score), url))
-    conn.commit()
-    cursor.close()
 
 if __name__ == "__main__":
-    conn = connect_to_mysql()
-    adj_matrix, id_url_map = fetch_links(conn)
-    ranks = pagerank(adj_matrix)
-    update_pagerank_scores(conn, ranks, id_url_map)
-    print("PageRank berhasil dihitung dan disimpan ke database.")
+    main()
