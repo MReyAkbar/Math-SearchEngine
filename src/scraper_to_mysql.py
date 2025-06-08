@@ -15,7 +15,7 @@ def main():
     print(f"Starting to crawl from: {start_url}")
     
     try:
-        pages, links = crawl_site(start_url, max_pages=20)
+        pages, links = crawl_site(start_url, max_pages=100)
         print(f"Crawled {len(pages)} pages and found {len(links)} links")
         
         # Save to database

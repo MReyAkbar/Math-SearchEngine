@@ -4,46 +4,109 @@
     <meta charset="UTF-8">
     <title>Hasil Pencarian untuk: {{ query }}</title>
     <style>
-        body { font-family: sans-serif; margin: 2em; }
-        .result-item { margin-bottom: 1.5em; }
-        .result-title a { font-size: 1.2em; text-decoration: none; color: #1a0dab; }
-        .result-title a:hover { text-decoration: underline; }
-        .result-url { color: #006621; font-size: 0.9em; }
-        .result-snippet { color: #545454; }
-        .search-bar { margin-bottom: 2em; }
+        body { 
+            font-family: sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #4285f4;
+        }
+        input[type="submit"] {
+            padding: 10px 30px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #357abd;
+        }
+        .result-item { 
+            margin-bottom: 1.5em;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .result-title a { 
+            font-size: 1.2em; 
+            text-decoration: none; 
+            color: #1a0dab; 
+        }
+        .result-title a:hover { 
+            text-decoration: underline; 
+        }
+        .result-url { 
+            color: #006621; 
+            font-size: 0.9em;
+            margin: 4px 0;
+        }
+        .result-snippet { 
+            color: #545454; 
+        }
+        .search-bar { 
+            margin-bottom: 2em;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <h1>Pencarian UM</h1>
-    <div class="search-bar">
-        <form action="/search" method="get">
-            <input type="text" name="q" size="40" value="{{ query }}">
-            <input type="submit" value="Cari">
-        </form>
+    <div class="container">
+        <div class="search-bar">
+            <a href="/">
+                <img src="https://um.ac.id/wp-content/uploads/2019/04/logo-um-terbaru-2015-biru.png" alt="Logo UM" class="logo">
+            </a>
+            <form action="/search" method="get">
+                <input type="text" name="q" size="40" value="{{ query }}">
+                <input type="submit" value="Cari">
+            </form>
+        </div>
+
+        <hr>
+
+        {% if results %}
+            <p>Sekitar {{ result_count }} hasil ditemukan untuk pencarian "<strong>{{ query }}</strong>"</p>
+            
+            {% for page in results %}
+                <div class="result-item">
+                    <div class="result-title">
+                        <a href="{{ page.url }}" target="_blank">{{ page.title }}</a>
+                    </div>
+                    <div class="result-url">
+                        {{ page.url }}
+                    </div>
+                    <div class="result-snippet">
+                        {{ page.content[:300] | safe }}...
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <p>Tidak ada hasil yang ditemukan untuk pencarian "<strong>{{ query }}</strong>".</p>
+        {% endif %}
     </div>
-
-    <hr>
-
-    {% if results %}
-        <p>Sekitar {{ result_count }} hasil ditemukan untuk pencarian "<strong>{{ query }}</strong>"</p>
-        
-        {% for page in results %}
-            <div class="result-item">
-                <div class="result-title">
-                    <a href="{{ page.url }}" target="_blank">{{ page.title }}</a>
-                </div>
-                <div class="result-url">
-                    {{ page.url }}
-                </div>
-                <div class="result-snippet">
-                    {{ page.content[:300] | safe }}...
-                </div>
-            </div>
-        {% endfor %}
-
-    {% else %}
-        <p>Tidak ada hasil yang ditemukan untuk pencarian "<strong>{{ query }}</strong>".</p>
-    {% endif %}
-
 </body>
 </html>

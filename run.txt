@@ -1,0 +1,3 @@
+python src/scrapper_to_mysql.py
+python src/main.py terus milih 2
+python app.py

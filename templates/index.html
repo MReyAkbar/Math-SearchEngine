@@ -4,12 +4,58 @@
     <meta charset="UTF-8">
     <title>Mesin Pencari UM</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 80vh; }
-        .container { text-align: center; }
+        body { 
+            font-family: sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 80vh;
+            background-color: #f5f5f5;
+        }
+        .container { 
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        input[type="text"] {
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #4285f4;
+        }
+        input[type="submit"] {
+            padding: 10px 30px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #357abd;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <img src="https://um.ac.id/wp-content/uploads/2019/04/logo-um-terbaru-2015-biru.png" alt="Logo UM" class="logo">
         <h1>Mesin Pencari UM</h1>
         <form action="/search" method="get">
             <input type="text" name="q" size="50" autofocus>
