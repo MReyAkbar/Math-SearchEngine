@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hasil Pencarian untuk: {{ query }}</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        .result-item { margin-bottom: 1.5em; }
+        .result-title a { font-size: 1.2em; text-decoration: none; color: #1a0dab; }
+        .result-title a:hover { text-decoration: underline; }
+        .result-url { color: #006621; font-size: 0.9em; }
+        .result-snippet { color: #545454; }
+        .search-bar { margin-bottom: 2em; }
+    </style>
+</head>
+<body>
+    <h1>Pencarian UM</h1>
+    <div class="search-bar">
+        <form action="/search" method="get">
+            <input type="text" name="q" size="40" value="{{ query }}">
+            <input type="submit" value="Cari">
+        </form>
+    </div>
+
+    <hr>
+
+    {% if results %}
+        <p>Sekitar {{ result_count }} hasil ditemukan untuk pencarian "<strong>{{ query }}</strong>"</p>
+        
+        {% for page in results %}
+            <div class="result-item">
+                <div class="result-title">
+                    <a href="{{ page.url }}" target="_blank">{{ page.title }}</a>
+                </div>
+                <div class="result-url">
+                    {{ page.url }}
+                </div>
+                <div class="result-snippet">
+                    {{ page.content[:300] | safe }}...
+                </div>
+            </div>
+        {% endfor %}
+
+    {% else %}
+        <p>Tidak ada hasil yang ditemukan untuk pencarian "<strong>{{ query }}</strong>".</p>
+    {% endif %}
+
+</body>
+</html>
